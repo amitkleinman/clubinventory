@@ -18,10 +18,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # --- Enums ---
-    op.execute("CREATE TYPE IF NOT EXISTS user_role AS ENUM ('COO', 'EQUIPMENT_MANAGER', 'ADMIN')")
-    op.execute("CREATE TYPE IF NOT EXISTS department_type AS ENUM ('Academy', 'Youth', 'First Team', 'Merchandise Shop')")
-    op.execute("CREATE TYPE IF NOT EXISTS movement_type AS ENUM ('IN', 'OUT', 'TRANSFER', 'DAMAGE')")
-    op.execute("CREATE TYPE IF NOT EXISTS delivery_note_status AS ENUM ('draft', 'pending', 'approved', 'cancelled')")
+    conn = op.get_bind()
+    for type_name, values in [
+        ("user_role", "('COO', 'EQUIPMENT_MANAGER', 'ADMIN')"),
+        ("department_type", "('Academy', 'Youth', 'First Team', 'Merchandise Shop')"),
+        ("movement_type", "('IN', 'OUT', 'TRANSFER', 'DAMAGE')"),
+        ("delivery_note_status", "('draft', 'pending', 'approved', 'cancelled')"),
+]:
+    exists = conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = :n"), {"n": type_name}).scalar()
+    if not exists:
+        conn.execute(sa.text(f"CREATE TYPE {type_name} AS ENUM {values}"))
 
     # --- users ---
     op.create_table(
