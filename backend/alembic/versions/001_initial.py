@@ -19,15 +19,14 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # --- Enums ---
     conn = op.get_bind()
-    for type_name, values in [
-        ("user_role", "('COO', 'EQUIPMENT_MANAGER', 'ADMIN')"),
-        ("department_type", "('Academy', 'Youth', 'First Team', 'Merchandise Shop')"),
-        ("movement_type", "('IN', 'OUT', 'TRANSFER', 'DAMAGE')"),
-        ("delivery_note_status", "('draft', 'pending', 'approved', 'cancelled')"),
-]:
-    exists = conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = :n"), {"n": type_name}).scalar()
-    if not exists:
-        conn.execute(sa.text(f"CREATE TYPE {type_name} AS ENUM {values}"))
+    if not conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = 'user_role'")).scalar():
+        conn.execute(sa.text("CREATE TYPE user_role AS ENUM ('COO', 'EQUIPMENT_MANAGER', 'ADMIN')"))
+    if not conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = 'department_type'")).scalar():
+        conn.execute(sa.text("CREATE TYPE department_type AS ENUM ('Academy', 'Youth', 'First Team', 'Merchandise Shop')"))
+    if not conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = 'movement_type'")).scalar():
+        conn.execute(sa.text("CREATE TYPE movement_type AS ENUM ('IN', 'OUT', 'TRANSFER', 'DAMAGE')"))
+    if not conn.execute(sa.text("SELECT 1 FROM pg_type WHERE typname = 'delivery_note_status'")).scalar():
+        conn.execute(sa.text("CREATE TYPE delivery_note_status AS ENUM ('draft', 'pending', 'approved', 'cancelled')"))
 
     # --- users ---
     op.create_table(
