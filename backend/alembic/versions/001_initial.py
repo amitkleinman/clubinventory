@@ -18,23 +18,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # --- Enums ---
-    user_role = postgresql.ENUM("COO", "EQUIPMENT_MANAGER", "ADMIN", name="user_role", create_type=False)
-    user_role.create(op.get_bind(), checkfirst=True)
-
-    department_type = postgresql.ENUM(
-    "Academy", "Youth", "First Team", "Merchandise Shop",
-    name="department_type", create_type=False,
-)
-    department_type.create(op.get_bind(), checkfirst=True)
-
-    movement_type = postgresql.ENUM("IN", "OUT", "TRANSFER", "DAMAGE", name="movement_type", create_type=False)
-    movement_type.create(op.get_bind(), checkfirst=True)
-
-    delivery_note_status = postgresql.ENUM(
-    "draft", "pending", "approved", "cancelled",
-    name="delivery_note_status", create_type=False,
-)
-    delivery_note_status.create(op.get_bind(), checkfirst=True)
+    op.execute("CREATE TYPE IF NOT EXISTS user_role AS ENUM ('COO', 'EQUIPMENT_MANAGER', 'ADMIN')")
+    op.execute("CREATE TYPE IF NOT EXISTS department_type AS ENUM ('Academy', 'Youth', 'First Team', 'Merchandise Shop')")
+    op.execute("CREATE TYPE IF NOT EXISTS movement_type AS ENUM ('IN', 'OUT', 'TRANSFER', 'DAMAGE')")
+    op.execute("CREATE TYPE IF NOT EXISTS delivery_note_status AS ENUM ('draft', 'pending', 'approved', 'cancelled')")
 
     # --- users ---
     op.create_table(
