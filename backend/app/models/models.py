@@ -78,7 +78,7 @@ class User(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     # relationships
-    delivery_notes: Mapped[list["DeliveryNote"]] = relationship(back_populates="created_by_user")
+    delivery_notes: Mapped[list["DeliveryNote"]] = relationship(back_populates="created_by_user", foreign_keys="[DeliveryNote.created_by]")
     movements: Mapped[list["InventoryMovement"]] = relationship(back_populates="created_by_user")
 
     def __repr__(self) -> str:
@@ -314,7 +314,6 @@ class DeliveryNote(Base, TimestampMixin):
     # relationships
     created_by_user: Mapped["User"] = relationship(
         back_populates="delivery_notes", foreign_keys="[DeliveryNote.created_by]"
-    )
     )
     items: Mapped[list["DeliveryNoteItem"]] = relationship(
         back_populates="delivery_note", cascade="all, delete-orphan"
