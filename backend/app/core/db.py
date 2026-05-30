@@ -4,8 +4,16 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from .config import settings
 
+
+def _get_db_url() -> str:
+    url = settings.DATABASE_URL
+    url = url.replace("postgres://", "postgresql+asyncpg://")
+    url = url.replace("postgresql://", "postgresql+asyncpg://")
+    return url
+
+
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _get_db_url(),
     echo=False,
     pool_pre_ping=True,
     pool_size=10,
