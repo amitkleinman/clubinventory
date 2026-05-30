@@ -313,7 +313,8 @@ class DeliveryNote(Base, TimestampMixin):
 
     # relationships
     created_by_user: Mapped["User"] = relationship(
-        back_populates="delivery_notes", foreign_keys=[created_by]
+        back_populates="delivery_notes", foreign_keys="[DeliveryNote.created_by]"
+    )
     )
     items: Mapped[list["DeliveryNoteItem"]] = relationship(
         back_populates="delivery_note", cascade="all, delete-orphan"
